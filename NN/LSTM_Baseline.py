@@ -75,5 +75,5 @@ model.fit(X_t, y, batch_size=32, epochs=3, validation_split=0.1)
 y_test = model.predict([X_te], batch_size=1024, verbose=1)
 sample_submission = pd.read_csv(Settings.sample_sub_path)
 sample_submission[list_classes] = y_test
-sample_submission.to_csv(f'..{Settings.sub_path}', index=False)
+sample_submission.to_csv(Settings.sub_path, index=False)
 
