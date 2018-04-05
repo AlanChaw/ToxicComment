@@ -8,7 +8,7 @@ from keras.models import Model
 from keras import initializers, regularizers, constraints, optimizers, layers
 from keras.callbacks import EarlyStopping
 
-from NN.Settings import *
+from NN import Settings
 
 #
 # path = '../input/'

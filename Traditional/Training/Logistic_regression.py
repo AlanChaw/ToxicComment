@@ -6,7 +6,7 @@ import pandas as pd
 from time import time
 import numpy as np
 from Traditional.Preprocess.VSM import VSM
-from Settings import *
+from SettingsS import *
 
 train = pd.read_csv(Settings.train_cleaned_file_path)
 test = pd.read_csv(Settings.test_cleaned_file_path)

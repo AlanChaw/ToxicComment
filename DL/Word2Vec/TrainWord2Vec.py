@@ -1,6 +1,6 @@
 import gensim
 import logging
-from Settings import *
+from SettingsS import *
 import pandas as pd
 import re
 from nltk.tokenize import TweetTokenizer

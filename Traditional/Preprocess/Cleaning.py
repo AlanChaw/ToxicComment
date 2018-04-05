@@ -1,6 +1,6 @@
 # file process
 import pandas as pd
-from Settings import *
+from SettingsS import *
 # preprocess
 import re
 

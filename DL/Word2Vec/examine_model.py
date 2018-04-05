@@ -1,5 +1,5 @@
 import gensim
-from Settings import *
+from SettingsS import *
 
 
 model_path = Settings.word2vec_model_path

@@ -1,4 +1,4 @@
-from Settings import *
+from SettingsS import *
 
 from keras.models import Sequential
 
