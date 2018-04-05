@@ -7,7 +7,7 @@ from keras.layers import Bidirectional, GlobalMaxPool1D
 from keras.models import Model
 from keras import initializers, regularizers, constraints, optimizers, layers
 from keras.callbacks import EarlyStopping
-
+sys.path.append('../')
 from NN import Settings
 
 #
