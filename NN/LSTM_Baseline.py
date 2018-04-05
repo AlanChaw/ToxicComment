@@ -8,16 +8,16 @@ from keras.models import Model
 from keras import initializers, regularizers, constraints, optimizers, layers
 from keras.callbacks import EarlyStopping
 
-from Settings import *
+from NN.Settings import *
 
 #
 # path = '../input/'
 # comp = 'jigsaw-toxic-comment-classification-challenge/'
 
 
-EMBEDDING_FILE = f'..{Settings.glove_model_path}'
-TRAIN_DATA_FILE = f'..{Settings.train_file_path}'
-TEST_DATA_FILE = f'..{Settings.test_file_path}'
+EMBEDDING_FILE = Settings.glove_model_path
+TRAIN_DATA_FILE = Settings.train_file_path
+TEST_DATA_FILE = Settings.test_file_path
 
 embed_size = 50  # how big is each word vector
 max_features = 50000  # how many unique words to use (i.e num rows in embedding vector)
@@ -73,7 +73,7 @@ callbacks = [EarlyStopping(monitor='val_loss', min_delta=0,
 model.fit(X_t, y, batch_size=32, epochs=3, validation_split=0.1)
 
 y_test = model.predict([X_te], batch_size=1024, verbose=1)
-sample_submission = pd.read_csv(f'..{Settings.sample_sub_path}')
+sample_submission = pd.read_csv(Settings.sample_sub_path)
 sample_submission[list_classes] = y_test
 sample_submission.to_csv(f'..{Settings.sub_path}', index=False)
 
