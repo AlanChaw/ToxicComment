@@ -25,8 +25,7 @@ TEST_DATA_FILE = Settings.test_file_path
 embed_size = 50  # how big is each word vector
 max_features = 1000  # how many unique words to use (i.e num rows in embedding vector)
 maxlen = 100  # max number of words in a comment to use
-implemt = 1  # rnn implemtation method
-visual = True  # trigger of plot
+visual = False  # trigger of plot
 
 train = pd.read_csv(TRAIN_DATA_FILE)
 test = pd.read_csv(TEST_DATA_FILE)
@@ -84,7 +83,7 @@ def double_LSTM():
 def pure_bi_LSTM():
     inp = Input(shape=(maxlen,))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
-    x = Bidirectional(LSTM(embed_size, return_sequences=False, dropout=0.5, recurrent_dropout=0.5, implementation=implemt))(x)
+    x = Bidirectional(LSTM(embed_size, return_sequences=False, dropout=0.5, recurrent_dropout=0.5))(x)
     x = Dense(6, activation="sigmoid")(x)
     return inp, x
 
@@ -93,8 +92,9 @@ def double_bi_LSTM():
     inp = Input(shape=(maxlen,))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
     x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
-    x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
-    x = Bidirectional(LSTM(embed_size, return_sequences=False,dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
+    # x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
+    x = Bidirectional(LSTM(embed_size, return_sequences=True,dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
+    x = GlobalMaxPool1D()(x)
     x = Dense(50, activation="relu")(x)
     x = Dense(6, activation="sigmoid")(x)
     return inp, x
@@ -104,7 +104,7 @@ def double_bi_LSTM():
 def bi_LSTM_GMP():
     inp = Input(shape=(maxlen, ))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
-    x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0, implementation=implemt))(x)
+    x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0)(x)
     x = GlobalMaxPool1D()(x)
     x = Dense(6, activation="sigmoid")(x)
     return inp, x
@@ -113,7 +113,7 @@ def bi_LSTM_GMP():
 def bi_LSTM_GMP_Dense():
     inp = Input(shape=(maxlen, ))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
-    x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0, implementation=implemt))(x)
+    x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0))(x)
     x = GlobalMaxPool1D()(x)
     x = Dense(50, activation="relu")(x)
     x = Dropout(0)(x)
