@@ -41,3 +41,5 @@ model = gensim.models.Word2Vec(sentences, min_count=1, size=100, workers=4)
 word_vectors = model.wv
 del model
 word_vectors.save(model_path)
+
+# model.save_word2vec_format('filepath/model.txt', binary=False)
