@@ -26,6 +26,7 @@ embed_size = 50  # how big is each word vector
 max_features = 1000  # how many unique words to use (i.e num rows in embedding vector)
 maxlen = 100  # max number of words in a comment to use
 implemt = 1  # rnn implemtation method
+visual = True  # trigger of plot
 
 train = pd.read_csv(TRAIN_DATA_FILE)
 test = pd.read_csv(TEST_DATA_FILE)
@@ -68,11 +69,7 @@ def pure_LSTM():
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
     x = LSTM(embed_size, return_sequences=False)(x)
     x = Dense(6, activation="sigmoid")(x)
-
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
+    return inp, x
 
 
 def double_LSTM():
@@ -81,11 +78,7 @@ def double_LSTM():
     x = LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0)(x)
     x = LSTM(embed_size, return_sequences=False, dropout=0, recurrent_dropout=0)(x)
     x = Dense(6, activation="sigmoid")(x)
-
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
+    return inp, x
 
 
 def pure_bi_LSTM():
@@ -93,11 +86,7 @@ def pure_bi_LSTM():
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
     x = Bidirectional(LSTM(embed_size, return_sequences=False, dropout=0.5, recurrent_dropout=0.5, implementation=implemt))(x)
     x = Dense(6, activation="sigmoid")(x)
-
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
+    return inp, x
 
 
 def double_bi_LSTM():
@@ -106,13 +95,9 @@ def double_bi_LSTM():
     x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
     x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
     x = Bidirectional(LSTM(embed_size, return_sequences=False,dropout=0, recurrent_dropout=0), merge_mode='concat')(x)
-    x = Dense(100, activation="relu")(x)
+    x = Dense(50, activation="relu")(x)
     x = Dense(6, activation="sigmoid")(x)
-
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
+    return inp, x
 
 
 # set return_sequences=True, and add a GlobalMaxPool1D()(x) layer after bi_LSTM layer
@@ -122,11 +107,7 @@ def bi_LSTM_GMP():
     x = Bidirectional(LSTM(embed_size, return_sequences=True, dropout=0, recurrent_dropout=0, implementation=implemt))(x)
     x = GlobalMaxPool1D()(x)
     x = Dense(6, activation="sigmoid")(x)
-
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
+    return inp, x
 
 
 def bi_LSTM_GMP_Dense():
@@ -137,19 +118,18 @@ def bi_LSTM_GMP_Dense():
     x = Dense(50, activation="relu")(x)
     x = Dropout(0)(x)
     x = Dense(6, activation="sigmoid")(x)
+    return inp, x
 
-    model = Model(inputs=inp, outputs=x)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+inp, x = bi_LSTM_GMP_Dense()
+model = Model(inputs=inp, outputs=x)
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+if visual:
     plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
-    return model
-
-
-
-model = double_bi_LSTM()
 
 callbacks = [EarlyStopping(monitor='val_loss', min_delta=0,
                                    patience=0, verbose=1, mode='auto')]
-model.fit(X_t, y, batch_size=32, epochs=10, validation_split=0.1, callbacks=callbacks)
+model.fit(X_t, y, batch_size=16, epochs=10, validation_split=0.1, callbacks=callbacks)
 
 y_test = model.predict([X_te], batch_size=1024, verbose=1)
 sample_submission = pd.read_csv(Settings.sample_sub_path)
