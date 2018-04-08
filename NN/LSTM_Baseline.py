@@ -22,7 +22,7 @@ EMBEDDING_FILE = Settings.glove_model_path
 TRAIN_DATA_FILE = Settings.train_file_path
 TEST_DATA_FILE = Settings.test_file_path
 
-embed_size = 50  # how big is each word vector
+embed_size = 200  # how big is each word vector
 max_features = 50000  # how many unique words to use (i.e num rows in embedding vector)
 maxlen = 100  # max number of words in a comment to use
 lstm_unit_size = 50
@@ -111,6 +111,7 @@ def bi_LSTM_GMP():
     return inp, x
 
 
+# original method
 def bi_LSTM_GMP_Dense():
     inp = Input(shape=(maxlen, ))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
@@ -130,7 +131,7 @@ if visual:
 
 callbacks = [EarlyStopping(monitor='val_loss', min_delta=0,
                                    patience=0, verbose=1, mode='auto')]
-model.fit(X_t, y, batch_size=16, epochs=10, validation_split=0.1, callbacks=callbacks)
+model.fit(X_t, y, batch_size=32, epochs=10, validation_split=0.1, callbacks=callbacks)
 
 y_test = model.predict([X_te], batch_size=1024, verbose=1)
 sample_submission = pd.read_csv(Settings.sample_sub_path)

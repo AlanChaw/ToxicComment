@@ -29,14 +29,14 @@ test = pd.read_csv(TEST_DATA_FILE)
 # parameters class
 class Para(object):
     # basic parameters
-    word_vec_size = 50      # word embedding size
+    word_vec_size = 200      # word embedding size
     max_features = 50000    # how many unique words to use
     sentence_length = 100   # how many words in a sentence
     # RNN parameters
     lstm_unit_size = 50     # the unit numbers (equal to the output vector length) of RNN
     dropout = 0.2           # dropout on input linear neuron
     recurrent_dropout = 0   # dropout on recurrent linear neuron
-    optimizer = 'adam'      # optimizer function
+    # optimizer = 'adam'      # optimizer function
     merge_mode = 'concat'   # bidirectional lstm merge method
     learning_rate = 0.001
 
@@ -156,7 +156,8 @@ def sequentila_original():
 # construct, compile and fit model
 x = bi_LSTM_GMP_Dense()
 model = Model(inputs=inp, outputs=x)
-model.compile(loss='binary_crossentropy', optimizer=Para.optimizer, metrics=['accuracy'])
+optimizer = Adam(lr=Para.learning_rate)
+model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 if visual:
     plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
 

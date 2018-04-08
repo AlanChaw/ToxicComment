@@ -9,7 +9,7 @@ test_trigger = False
 sample_sub_path = '../File/sample_submission.csv'
 sub_path = '../File/submission.csv'
 word2vec_model_path = '..//File/Word2VecModel/model'
-glove_model_path = '../File/Glove/glove.6B.50d.txt'
+glove_model_path = '../File/Glove/glove.6B.200d.txt'
 doc_vec_normalization = True
 
 if test_trigger:
