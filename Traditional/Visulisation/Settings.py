@@ -5,30 +5,27 @@
 
 
 test_trigger = False
-using_cleaned_data = False
 
-sample_sub_path = '../File/sample_submission.csv'
-sub_path = '../File/submission.csv'
-word2vec_model_path = '../File/Word2VecModel/model'
-glove_model_path = '../File/Glove/glove.840B.300d.txt'
+folder_path = '../../'
+
+sample_sub_path = folder_path + 'File/sample_submission.csv'
+sub_path = folder_path + 'File/submission_RCNN.csv'
+word2vec_model_path = folder_path + 'File/Word2VecModel/model'
+glove_model_path = folder_path + 'File/Glove/glove.6B.100d.txt'
 doc_vec_normalization = True
 
 if test_trigger:
-    train_file_path = '../File/Slice/train_first100.csv'
-    test_file_path = '../File/Slice/test_first100.csv'
-    train_cleaned_file_path = '../File/Middle/train_cleaned_slice.csv'
-    test_cleaned_file_path = '../File/Middle/test_cleaned_slice.csv'
-    features_file_path = '../File/Middle/features_slice.npz'
+    train_file_path = folder_path + 'File/Slice/train_first100.csv'
+    test_file_path = folder_path + 'File/Slice/test_first100.csv'
+    train_cleaned_file_path = folder_path + 'File/Middle/train_cleaned_slice.csv'
+    test_cleaned_file_path = folder_path + 'File/Middle/test_cleaned_slice.csv'
+    features_file_path = folder_path + 'File/Middle/features_slice.npz'
 else:
-    train_file_path = '../File/train.csv'
-    test_file_path = '../File/test.csv'
-    train_cleaned_file_path = '../File/Middle/train_cleaned.csv'
-    test_cleaned_file_path = '../File/Middle/test_cleaned.csv'
-    features_file_path = '../File/Middle/features.npz'
-
-    if using_cleaned_data:
-        train_file_path = train_cleaned_file_path
-        test_file_path = test_cleaned_file_path
+    train_file_path = folder_path + 'File/train.csv'
+    test_file_path = folder_path + 'File/test.csv'
+    train_cleaned_file_path = folder_path + 'File/Middle/train_cleaned.csv'
+    test_cleaned_file_path = folder_path + 'File/Middle/test_cleaned.csv'
+    features_file_path = folder_path + 'File/Middle/features.npz'
 
 APPO = {
     "aren't": "are not",

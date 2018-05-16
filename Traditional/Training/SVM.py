@@ -1,4 +1,4 @@
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 import pandas as pd
 import time
@@ -11,6 +11,7 @@ from scipy import sparse
 from sklearn.model_selection import ShuffleSplit
 import itertools
 from sklearn.metrics import roc_auc_score
+from sklearn.ensemble import BaggingClassifier
 
 
 
@@ -23,14 +24,16 @@ train_features, test_features = VSM_vec[0:train.__len__()], VSM_vec[train.__len_
 submission = pd.DataFrame.from_dict({'id': test['id']})
 
 
-def create_model(param=('sag', 0.1)):
+def create_model(C = 1):
     scores = []
     for class_name in label_cols:
         train_target = train[class_name]
-        model = LogisticRegression(solver=param[0], C=param[1], verbose=0, n_jobs=-1, penalty='l2')
-        # cv_score = np.mean(cross_val_score(model, train_features, train_target, cv=3, scoring='roc_auc', n_jobs=-1, verbose=1))
-        # cv = ShuffleSplit(n_splits=2, test_size=0.2, random_state=1)
-        X_train, X_test, y_train, y_test = train_test_split(train_features, train_target, test_size=0.2)
+        # model = SVC(C=C, kernel='linear', probability=True, class_weight='balanced', verbose=True)
+        n_estimators = 100
+        model = BaggingClassifier(SVC(kernel='linear', C=C, probability=True, class_weight='balanced', verbose=1),
+                                  n_estimators=n_estimators, max_samples=1.0 / n_estimators,
+                                  n_jobs=-1, verbose=1, bootstrap=False)
+        X_train, X_test, y_train, y_test = train_test_split(train_features, train_target, test_size=0.33)
         model.fit(X_train, y_train)
         y_proba = model.predict_proba(X_test)[:, 1]
         cv_score = roc_auc_score(y_test, y_proba)
@@ -50,13 +53,13 @@ def generate_combinations(param_grid):
 
 
 # param_grid = dict(test=['t1', 't2'], C=[0.001, 0.01, 0.1, 1, 10, 100], solver=['newton-cg', 'lbfgs', 'sag'])
-param_grid = dict(solver=['sag', 'liblinear', 'newton-cg', 'lbfgs'], C=[0.001, 0.01, 0.1, 1, 2, 4, 8])
+param_grid = dict(C=[0.01, 0.1, 1, 10])
 all_combinations = generate_combinations(param_grid)
 best_score = 0
 best_param = 0
 for param in all_combinations:
     start = time.time()
-    score = create_model(param=param)
+    score = create_model(C=param)
     elapsed = time.time() - start
     print("CV score for params: " + str(param) + "  is: " + str(score) + "  time: " + str(elapsed))
     if score > best_score:
@@ -65,10 +68,10 @@ for param in all_combinations:
 
 print("Best roc auc score: " + str(best_score) + "  With the params of: " + str(best_param))
 
-# for class_name in label_cols:
-#     train_target = train[class_name]
-#     model = LogisticRegression(C=best_param, solver='sag', verbose=0, n_jobs=-1)
-#     model.fit(train_features, train_target)
-#     submission[class_name] = model.predict_proba(test_features)[:, 1]
-# submission.to_csv(Settings.sub_path, index=False)
+for class_name in label_cols:
+    train_target = train[class_name]
+    model = SVC(C=best_param, kernel='linear', probability=True, class_weight=['balanced'], verbose=True)
+    model.fit(train_features, train_target)
+    submission[class_name] = model.predict_proba(test_features)[:, 1]
+submission.to_csv(Settings.sub_path, index=False)
 

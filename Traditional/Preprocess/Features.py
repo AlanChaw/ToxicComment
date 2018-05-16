@@ -1,5 +1,5 @@
 import pandas as pd
-from SettingsS import *
+from Traditional import Settings
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
 import re

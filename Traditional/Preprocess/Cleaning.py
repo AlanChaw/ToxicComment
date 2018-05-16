@@ -1,8 +1,10 @@
 # file process
 import pandas as pd
-from SettingsS import *
+from Traditional import Settings
 # preprocess
 import re
+import enchant
+from nltk.corpus import stopwords
 
 # nlp
 from nltk.stem import WordNetLemmatizer
@@ -15,6 +17,7 @@ train_cleaned_file = Settings.train_cleaned_file_path
 test_cleaned_file = Settings.test_cleaned_file_path
 tokenizer = TweetTokenizer()
 lemmatizer = WordNetLemmatizer()
+# eng_stopwords = set(stopwords.words("english"))
 counter = 0
 
 
@@ -37,9 +40,9 @@ def main():
 
 
 def clean(comment):
-    # global counter
-    # print(counter)
-    # counter = counter + 1
+    global counter
+    print(counter)
+    counter = counter + 1
 
     # print("before clean : ", comment)
     # to lower case
@@ -50,6 +53,19 @@ def clean(comment):
     comment = re.sub("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", "", comment)
     # delete username
     comment = re.sub("\[\[.*\]", "", comment)
+    # deal with "fuck"
+    comment = re.sub("f+u+c+k+", "fuck", comment)
+    comment = re.sub("f\su\sc\sk", "fuck", comment)
+    # deal with "bitch"
+    comment = re.sub("b+i+t+c+h+", "bitch", comment)
+    comment = re.sub("b\si\st\sc\sh ", "bitch", comment)
+    # deal with "suck"
+    comment = re.sub("s+u+c+k+", "suck", comment)
+    comment = re.sub("s\su\sc\sk", "suck", comment)
+    # deal with "you"
+    comment = re.sub("y+o+u+", "you", comment)
+    comment = re.sub("y\so\su", "you", comment)
+
     # split into words
     words = tokenizer.tokenize(comment)
     # change suoxie
@@ -59,13 +75,26 @@ def clean(comment):
     # lemmatize
     words = [lemmatizer.lemmatize(w, pos='v') for w in words]
     # delete stopwords
-    # words = [w for w in words if not w in set(stopwords.words("english"))]
+    words = [w for w in words if not w in set(stopwords.words("english"))]
+
     # delete punctuations
     pattern = re.compile("[^a-z]")
     words = [w for w in words if not pattern.match(w)]
 
+    # correct spelling
+    # d = enchant.Dict("en_US")
+    # words = [d.suggest(w)[0] if not d.check(w) else w for w in words]
+    # words = [d.suggest(w)[0] for w in words if d.check(w)]
+
     cleared_comment = " ".join(words)
     return cleared_comment
+
+
+def correct(word, d):
+    if not d.check(word):
+        return d.suggest(word)[0]
+    else:
+        return word
 
 
 if __name__ == '__main__':
