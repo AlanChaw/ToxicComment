@@ -22,7 +22,7 @@ EMBEDDING_FILE = Settings.glove_model_path
 TRAIN_DATA_FILE = Settings.train_file_path
 TEST_DATA_FILE = Settings.test_file_path
 
-embed_size = 100  # how big is each word vector
+embed_size = 300  # how big is each word vector
 max_features = 100000  # how many unique words to use (i.e num rows in embedding vector)
 maxlen = 150  # max number of words in a comment to use
 lstm_unit_size = 50

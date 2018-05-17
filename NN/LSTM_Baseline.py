@@ -112,8 +112,8 @@ def bi_lstm_pool():
     avg_pool = GlobalAveragePooling1D()(x)
     max_pool = GlobalMaxPooling1D()(x)
     x = concatenate([avg_pool, max_pool])
-    # x = Dense(50, activation="relu")(x)
-    # x = Dropout(0.2)(x)
+    x = Dense(50, activation="relu")(x)
+    x = Dropout(0.2)(x)
     x = Dense(6, activation="sigmoid")(x)
     return inp, x
 
@@ -147,7 +147,7 @@ def bi_gru_pool():
     return inp, x
 
 # bi 2*GRU pooling
-def bi_2lstm_pool():
+def bi_2gru_pool():
     inp = Input(shape=(maxlen, ))
     x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
     x = SpatialDropout1D(0.2)(x)
@@ -190,7 +190,7 @@ class RocAucEvaluation(Callback):
             print("\n ROC-AUC - epoch: {:d} - score: {:.6f}".format(epoch+1, score))
 
 
-inp, x = bi_lstm_pool()
+inp, x = bi_2lstm_pool()
 model = Model(inputs=inp, outputs=x)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -199,7 +199,6 @@ if visual:
     plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
 
 
-start = time.time()
 
 batch_size = 128
 epochs = 5
@@ -207,10 +206,17 @@ X_tra, X_val, y_tra, y_val = train_test_split(X_t, y, train_size=0.9)
 
 filepath = "weights_base.best.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-early = EarlyStopping(monitor="val_acc", mode="max", patience=5)
+early = EarlyStopping(monitor="val_acc", mode="max", patience=1)
 ra_val = RocAucEvaluation(validation_data=(X_val, y_val), interval = 1)
 callbacks_list = [ra_val, checkpoint, early]
+
+start = time.time()
+
 model.fit(X_tra, y_tra, batch_size=batch_size, epochs=epochs, validation_data=(X_val, y_val),callbacks = callbacks_list, verbose=1)
+
+interval = time.time() - start
+print("time interval: " + str(interval))
+
 # # Loading model weights
 model.load_weights(filepath)
 print('Predicting....')
